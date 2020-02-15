@@ -1,9 +1,15 @@
+import com.google.common.base.CaseFormat;
 import config.Env;
 import model.Schema;
-import service.db.DBManager;
+import model.Table;
+import service.AbstractGenerator;
+import service.AbstractManager;
+import service.generator.FreeMakerGenerator;
+import service.manager.Manager;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Yuu2
@@ -11,15 +17,26 @@ import java.util.List;
  */
 public class Main {
 
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) {
 
-    String[] dbList = new String[] {"todoapp_db"};
+		AbstractManager manager = new Manager();
 
-    final Env env = new Env();
+		List<Schema> schema  = manager.findSchema(new String[] {"todoapp_db"});
+		List<String> imports = Arrays.asList(new String[] {"java.io", "java.sql"});
 
-		DBManager manager = new DBManager();
-		List<Schema> schema = manager.findSchema(dbList);
+		AbstractGenerator creator = new FreeMakerGenerator();
+											creator.setTemplate("service.ftl");
 
-    System.out.println(schema);
+		schema.parallelStream().forEach(db -> {
+                        List<Table> tables = db.getTables().stream().map(t -> {
+                          t.setName(CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, "CAMEL_CASE"));
+                          return t;
+                        }).collect(Collectors.toList());
+
+                        creator.addModel("package", tables);
+												creator.write();
+		});
+
+		Env.THREADPOOL.shutdown();
 	}
 }

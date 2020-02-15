@@ -2,12 +2,15 @@
 updated 2020.02.15
 
 ## 개요(Summary)
-수많은 서비스와 리포지토리를 만들어야 하는 
-비생산적인 업무를 단축시키고 남은 시간은 농땡이 피우기 위한
-프로젝트.
+수도 없이 많은 서비스와 리포지토리 클래스를 만들어야 할 때 사용한다.
+잡무 하지 말자 ...
+## 주요 기능(Main Function)
+- DB 데이터로부터 클래스파일 생성
 
-## 설치하는법(Installation)
-- 자바 실행환경 (https://www.oracle.com/java/technologies/javase/jdk13-archive-downloads.html)
-- 
+## 실행 환경(Runtime Environment)
+JRE 13, MySQL 5.7... <br>
 
-## 참조() 
+이후 개발하면서 DB 종류를 늘려갈 예정.
+
+## 참조(Reference)
+선임 개발자의 소스코드를 보고 아이디어를 얻음. 

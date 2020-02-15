@@ -13,6 +13,7 @@ public class Property {
   private Properties properties;
 
   public Property(String fileName) {
+
     properties = new Properties();
     load(properties, fileName);
   }

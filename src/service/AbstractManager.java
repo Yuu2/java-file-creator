@@ -1,4 +1,4 @@
-package service.db;
+package service;
 
 import com.mysql.jdbc.DatabaseMetaData;
 import config.Env;
@@ -9,48 +9,39 @@ import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
-import java.sql.Statement;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
-public abstract class AbstractDBManager implements Serializable, AutoCloseable {
+/**
+ * @author Yuu2
+ * updated 2020.02.15
+ */
+public interface AbstractManager extends AutoCloseable, Serializable {
 
-  Connection conn;
-  Statement stmt;
-
-  String driver;
-  String username;
-  String password;
-  String host;
-  String port;
-
-  public AbstractDBManager() {
-    this.host     = Env.DB.get("host");
-    this.port     = Env.DB.get("port");
-    this.driver   = Env.DB.get("driver");
-    this.username = Env.DB.get("username");
-    this.password = Env.DB.get("password");
-  }
+  String driver   = Env.DB.get("driver");
+  String username = Env.DB.get("username");
+  String password = Env.DB.get("password");
+  String host     = Env.DB.get("host");
+  String port     = Env.DB.get("port");
 
   /**
-   * 데이터베이스 정보 취득
+   * 데이터베이스 전체 정보 취득
    */
-  public List<Schema> findSchema(String[] schema_arr) {
+  public default List<Schema> findSchema(String[] schemaArr) {
 
-    return Arrays.asList(schema_arr).parallelStream().map(
+    return Arrays.asList(schemaArr).parallelStream().map(
 
         db -> {
-          System.out.println(db);
+
           Schema schema = new Schema();
-                 schema.setName(db);
+          schema.setName(db);
 
           try(this) {
 
             // DB 연결
             Class.forName(driver);
-            conn = DriverManager.getConnection(host + ":" + port + "/" + db, username, password);
+            Connection conn = DriverManager.getConnection(host + ":" + port + "/" + db, username, password);
 
             // DB 메타데이터 취득
             DatabaseMetaData metaData = (DatabaseMetaData) conn.getMetaData();
@@ -72,12 +63,5 @@ public abstract class AbstractDBManager implements Serializable, AutoCloseable {
         }
 
     ).collect(Collectors.toList());
-  }
-
-  @Override
-  public void close() throws Exception {
-    // todo:
-    System.out.println("커넥션 닫기");
-    conn.close();
   }
 }
