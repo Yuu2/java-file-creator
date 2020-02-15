@@ -8,9 +8,9 @@ updated 2020.02.15
 - DB 데이터로부터 클래스파일 생성
 
 ## 실행 환경(Runtime Environment)
-JRE 13, MySQL 5.7... <br>
+JRE 11 - 13, MySQL 5.7... <br>
 
-이후 개발하면서 DB 종류를 늘려갈 예정.
+DB 종류는 이후 개발하면서 늘려갈 예정.
 
 ## 참조(Reference)
 선임 개발자의 소스코드를 보고 아이디어를 얻음. 

@@ -2,8 +2,8 @@ package service;
 
 import com.mysql.jdbc.DatabaseMetaData;
 import config.Env;
-import model.Schema;
-import model.Table;
+import model.impl.Schema;
+import model.impl.Table;
 
 import java.io.Serializable;
 import java.sql.Connection;
@@ -19,7 +19,6 @@ import java.util.stream.Collectors;
  */
 public interface AbstractManager extends AutoCloseable, Serializable {
 
-  String driver   = Env.DB.get("driver");
   String username = Env.DB.get("username");
   String password = Env.DB.get("password");
   String host     = Env.DB.get("host");
@@ -28,7 +27,7 @@ public interface AbstractManager extends AutoCloseable, Serializable {
   /**
    * 데이터베이스 전체 정보 취득
    */
-  public default List<Schema> findSchema(String[] schemaArr) {
+  public default List<Schema> getSchema(String[] schemaArr) {
 
     return Arrays.asList(schemaArr).parallelStream().map(
 
@@ -37,11 +36,9 @@ public interface AbstractManager extends AutoCloseable, Serializable {
           Schema schema = new Schema();
           schema.setName(db);
 
-          try(this) {
-
-            // DB 연결
-            Class.forName(driver);
-            Connection conn = DriverManager.getConnection(host + ":" + port + "/" + db, username, password);
+          try(
+           Connection conn = DriverManager.getConnection(host + ":" + port + "/" + db, username, password);
+          ) {
 
             // DB 메타데이터 취득
             DatabaseMetaData metaData = (DatabaseMetaData) conn.getMetaData();
@@ -56,8 +53,7 @@ public interface AbstractManager extends AutoCloseable, Serializable {
             }
 
           } catch(Exception e) {
-            // todo:
-            e.printStackTrace();
+            // todo: Logger
           }
           return schema;
         }

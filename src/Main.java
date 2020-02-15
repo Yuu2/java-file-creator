@@ -1,7 +1,7 @@
 import com.google.common.base.CaseFormat;
 import config.Env;
-import model.Schema;
-import model.Table;
+import model.impl.Schema;
+import model.impl.Table;
 import service.AbstractGenerator;
 import service.AbstractManager;
 import service.generator.FreeMakerGenerator;
@@ -19,22 +19,24 @@ public class Main {
 
 	public static void main(String[] args) {
 
-		AbstractManager manager = new Manager();
-
-		List<Schema> schema  = manager.findSchema(new String[] {"todoapp_db"});
-		List<String> imports = Arrays.asList(new String[] {"java.io", "java.sql"});
-
+		AbstractManager   manager = new Manager();
 		AbstractGenerator creator = new FreeMakerGenerator();
-											creator.setTemplate("service.ftl");
+
+		// DB 정보 취득
+		List<Schema> schema = manager.getSchema(new String[] {
+
+		});
+
+		List<String> imports = Arrays.asList(new String[] {
+				"java.io",
+				"java.sql"
+		});
+
+		// creator.setTemplate("service.ftl");
 
 		schema.parallelStream().forEach(db -> {
-                        List<Table> tables = db.getTables().stream().map(t -> {
-                          t.setName(CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, "CAMEL_CASE"));
-                          return t;
-                        }).collect(Collectors.toList());
-
-                        creator.addModel("package", tables);
-												creator.write();
+			// creator.addModel("package", tables);
+			// creator.write();
 		});
 
 		Env.THREADPOOL.shutdown();
