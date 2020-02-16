@@ -19,26 +19,27 @@ public class Main {
 
 	public static void main(String[] args) {
 
-		AbstractManager   manager = new Manager();
-		AbstractGenerator creator = new FreeMakerGenerator();
+		AbstractManager   manager   = new Manager();
+		AbstractGenerator generator = new FreeMakerGenerator();
+											generator.setTemplate("service.ftl");
 
 		// DB 정보 취득
-		List<Schema> schema = manager.getSchema(new String[] {
-
+		List<Schema> schema = manager.findTables(new String[] {
+			"todoapp_db"
 		});
 
+		// imports 세팅
 		List<String> imports = Arrays.asList(new String[] {
 				"java.io",
 				"java.sql"
 		});
 
-		// creator.setTemplate("service.ftl");
 
-		schema.parallelStream().forEach(db -> {
-			// creator.addModel("package", tables);
-			// creator.write();
-		});
+		generator.addModel("imports", imports);
+		generator.addModel("schema" , schema);
 
-		Env.THREADPOOL.shutdown();
+		System.out.println(schema.toString());
+		generator.read("service.ftl");
+		Env.THREAD_POOL.shutdown();
 	}
 }

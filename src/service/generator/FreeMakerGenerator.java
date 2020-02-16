@@ -41,7 +41,7 @@ public class FreeMakerGenerator implements AbstractGenerator {
 
   @Override
   public String read(String template) {
-    String text = null;
+    String line = null;
 
     try(
       FileReader fr = new FileReader(Env.TEMPLATE_PATH + "/" + template);
@@ -49,14 +49,14 @@ public class FreeMakerGenerator implements AbstractGenerator {
      ) {
 
       while(br.readLine() != null) {
-        text += br.readLine();
+        line = br.readLine();
       }
 
     } catch (Exception e) {
       e.printStackTrace();
     }
 
-    return text;
+    return line;
   }
 
   @Override

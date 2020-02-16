@@ -1,19 +1,37 @@
 package model.impl;
 
-public class Table {
+import model.Model;
 
-  public String name;
+import java.util.ArrayList;
+import java.util.List;
 
-  public void setName(String name) {
-    this.name = name;
-  }
+public class Table extends Model {
 
-  public String getName() {
-    return this.name;
-  }
+	List<Column> columns;
 
-  @Override
-  public String toString() {
-    return "Table{" + "name='" + name + '\'' + '}';
-  }
+	public Table(String model) {
+		super(model);
+		columns = new ArrayList<>();
+	}
+
+	public void setColumns(List<Column> columns) {
+		this.columns = columns;
+	}
+
+	public List<Column> getColumns() {
+		return columns;
+	}
+
+	public void addColumn(Column column) {
+		columns.add(column);
+	}
+
+	@Override
+	public String toString() {
+		return "Table{" +
+				"columns=" + columns +
+				", defaultName='" + defaultName + '\'' +
+				'}';
+	}
 }
+		

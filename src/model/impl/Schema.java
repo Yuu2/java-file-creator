@@ -3,13 +3,14 @@ package model.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Schema {
+import model.Model;
 
-  private String name;
+public class Schema extends Model {
 
   private List<Table> tables;
 
-  public Schema() {
+  public Schema(String model) {
+	super(model);
     this.tables = new ArrayList<>();
   }
 
@@ -17,13 +18,6 @@ public class Schema {
     this.tables.add(table);
   }
 
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
 
   public List<Table> getTables() {
     return this.tables;
@@ -31,6 +25,12 @@ public class Schema {
 
   @Override
   public String toString() {
-    return "Schema{" + "name='" + name + '\'' + ", tables=" + tables + '}';
+    return "Schema " +
+        "{" +
+          "  tables="       + tables +
+          ", defaultName='" + defaultName + '\'' +
+          ", upperCamelName='" + upperCamelName + '\'' +
+          ", lowerCamelName='" + lowerCamelName + '\'' +
+        "}";
   }
 }

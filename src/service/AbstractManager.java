@@ -2,12 +2,15 @@ package service;
 
 import com.mysql.jdbc.DatabaseMetaData;
 import config.Env;
+import model.impl.Column;
 import model.impl.Schema;
 import model.impl.Table;
 
+import javax.xml.transform.Result;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Arrays;
 import java.util.List;
@@ -25,30 +28,55 @@ public interface AbstractManager extends AutoCloseable, Serializable {
   String port     = Env.DB.get("port");
 
   /**
-   * 데이터베이스 전체 정보 취득
+   * 테이블 컬럼명 취득
    */
-  public default List<Schema> getSchema(String[] schemaArr) {
+  private static Table findColumns(Table table, String url) {
+
+    String sql = "SHOW COLUMNS FROM " + table.getDefaultName();
+
+    try(
+        Connection conn = DriverManager.getConnection(url, username, password);
+        PreparedStatement pstmt = conn.prepareStatement(sql);
+        ResultSet rs = pstmt.executeQuery();
+    ) {
+      while(rs.next()) {
+        String model = rs.getString(1);
+
+        if(model == null)
+        continue;
+
+        table.addColumn(new Column(model));
+      }
+    } catch(Exception e) {
+      // todo: Logger
+    }
+    return table;
+  }
+  
+  /**
+   * 데이터베이스 테이블 취득
+   */
+  public default List<Schema> findTables(String[] schemaArr) {
 
     return Arrays.asList(schemaArr).parallelStream().map(
 
         db -> {
-
-          Schema schema = new Schema();
-          schema.setName(db);
+          Schema schema = new Schema(db);
+          String url = host + ":" + port + "/" + db;
 
           try(
-           Connection conn = DriverManager.getConnection(host + ":" + port + "/" + db, username, password);
+           Connection conn = DriverManager.getConnection(url, username, password);
           ) {
 
             // DB 메타데이터 취득
             DatabaseMetaData metaData = (DatabaseMetaData) conn.getMetaData();
             ResultSet rs = metaData.getTables(null, null, "%", new String[] {"TABLE"});
-
+            
             // 테이블 정보 보존
             while(rs.next()) {
-              Table table = new Table();
-              table.setName(rs.getString("TABLE_NAME"));
-
+              String model = rs.getString("TABLE_NAME");
+              Table table = new Table(model);
+                    table = findColumns(table, url);
               schema.addTable(table);
             }
 

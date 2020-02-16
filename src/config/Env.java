@@ -22,5 +22,5 @@ public class Env {
   // 환경설정 프로퍼티
   public static final Property CONFIG = new Property("config.properties");
   // 스레드풀 사이즈
-  public static final ExecutorService THREADPOOL = Executors.newFixedThreadPool(Integer.parseInt(CONFIG.get("pool.size")));
+  public static final ExecutorService THREAD_POOL = Executors.newFixedThreadPool(Integer.parseInt(CONFIG.get("pool.size")));
 }
