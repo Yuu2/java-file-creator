@@ -15,6 +15,8 @@ public class Env {
   public static final String TEMPLATE_PATH = System.getProperty("user.dir") + "/" + "template";
   // 프로퍼티 경로
   public static final String PROPERTY_PATH = RESOURCE_PATH  + "/property";
+  // 출력 경로
+  public static final String OUTPUT_PATH   = RESOURCE_PATH  + "/output";
   // SQL 경로
   public static final String SQL_PATH      = RESOURCE_PATH + "/sql";
   // DB 관련 프로퍼티

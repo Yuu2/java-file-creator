@@ -30,7 +30,7 @@ public class Table extends Model {
 	public String toString() {
 		return "Table{" +
 				"columns=" + columns +
-				", defaultName='" + defaultName + '\'' +
+				", name='" + name + '\'' +
 				'}';
 	}
 }

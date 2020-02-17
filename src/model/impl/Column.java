@@ -10,6 +10,6 @@ public class Column extends Model {
 
   @Override
   public String toString() {
-    return defaultName;
+    return name;
   }
 }

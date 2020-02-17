@@ -25,12 +25,13 @@ public class Schema extends Model {
 
   @Override
   public String toString() {
-    return "Schema " +
-        "{" +
-          "  tables="       + tables +
-          ", defaultName='" + defaultName + '\'' +
-          ", upperCamelName='" + upperCamelName + '\'' +
-          ", lowerCamelName='" + lowerCamelName + '\'' +
-        "}";
+    return "Schema{" +
+        "tables=" + tables +
+        ", name='" + name + '\'' +
+        ", upperCamel='" + upperCamel + '\'' +
+        ", lowerCamel='" + lowerCamel + '\'' +
+        ", lowerCamelUnderScore='" + lowerCamelUnderScore + '\'' +
+        ", upperCamelUnderScore='" + upperCamelUnderScore + '\'' +
+        '}';
   }
 }

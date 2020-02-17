@@ -1,10 +1,11 @@
 package 패키지경로
-<#list imports as import>
-import ${import}
-</#list>
 
 @Service
 @Transactional
-public class ${schema.defaultName} Service {
+public class ${upper_class_name}Service {
 
+    @Autowired
+    public ${upper_class_name}Mapper mapper;
+
+    <#list columns as column>${column.name} </#list>
 }

@@ -1,11 +1,9 @@
-import com.google.common.base.CaseFormat;
 import config.Env;
 import model.impl.Schema;
-import model.impl.Table;
 import service.AbstractGenerator;
-import service.AbstractManager;
+import service.AbstractFinder;
 import service.generator.FreeMakerGenerator;
-import service.manager.Manager;
+import service.finder.DBFinder;
 
 import java.util.Arrays;
 import java.util.List;
@@ -13,33 +11,46 @@ import java.util.stream.Collectors;
 
 /**
  * @author Yuu2
- * updated 2020.02.15
+ * updated 2020.02.17
+ * todo: SQL Generator
  */
 public class Main {
 
 	public static void main(String[] args) {
 
-		AbstractManager   manager   = new Manager();
+		AbstractFinder finder = new DBFinder();
 		AbstractGenerator generator = new FreeMakerGenerator();
-											generator.setTemplate("service.ftl");
+		generator.setTemplate("service.ftl");
 
-		// DB 정보 취득
-		List<Schema> schema = manager.findTables(new String[] {
-			"todoapp_db"
+		/* DB 메타데이터 */
+		List<Schema> schemaList = finder.findTables(new String[] {
+
 		});
 
-		// imports 세팅
+		/* 포함시킬 테이블 */
+		List<String> containedTblList = Arrays.asList(new String[] {
+
+		}).stream()
+			.map(String::toLowerCase)
+			.collect(Collectors.toList());;
+
+		/* Import */
 		List<String> imports = Arrays.asList(new String[] {
-				"java.io",
-				"java.sql"
+
 		});
 
+		/* Annotation */
+		List<String> annotations = Arrays.asList(new String[] {
 
-		generator.addModel("imports", imports);
-		generator.addModel("schema" , schema);
+		});
 
-		System.out.println(schema.toString());
-		generator.read("service.ftl");
+		/* Rendering */
+		FreeMakerGenerator freeMakerGenerator = (FreeMakerGenerator) generator;
+										   freeMakerGenerator.setContainedTblList(containedTblList);
+										   freeMakerGenerator.setModel("imports", imports);
+										   freeMakerGenerator.setModel("annotations", annotations);;
+		                   freeMakerGenerator.render(schemaList);
+
 		Env.THREAD_POOL.shutdown();
 	}
 }
