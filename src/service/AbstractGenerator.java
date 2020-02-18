@@ -35,9 +35,9 @@ public interface AbstractGenerator extends AutoCloseable, Serializable {
   /**
    * 템플릿 쓰기
    * @access public
-   * @param fileName 파일 이름
+   * @param filePath 파일 경로
    */
-  public abstract void write(String fileName);
+  public abstract void write(String filePath);
 
   /**
    * 템플릿 렌더링

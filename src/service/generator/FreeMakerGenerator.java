@@ -7,13 +7,16 @@ import model.impl.Schema;
 import service.AbstractGenerator;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class FreeMakerGenerator implements AbstractGenerator {
 
-  private List<String> containedTblList;
-  private List<String> exceptedTblList;
+  private List<String> containTables;
+  private List<String> exceptTables;
 
   private Configuration configuration;
   private Template template;
@@ -22,16 +25,16 @@ public class FreeMakerGenerator implements AbstractGenerator {
 
   public FreeMakerGenerator() {
     this.model = new LinkedHashMap<>();
-    this.containedTblList = new ArrayList<>();
-    this.exceptedTblList  = new ArrayList<>();
+    this.containTables = new ArrayList<>();
+    this.exceptTables  = new ArrayList<>();
   }
 
-  public void setContainedTblList(List<String> containedTblList) {
-    this.containedTblList = containedTblList;
+  public void setContainTables(List<String> containedTblList) {
+    this.containTables = containedTblList;
   }
 
-  public void setExceptedTblList(List<String> exceptedTblList) {
-    this.exceptedTblList = exceptedTblList;
+  public void setExceptTables(List<String> exceptedTblList) {
+    this.exceptTables = exceptedTblList;
   }
 
   @Override
@@ -43,7 +46,7 @@ public class FreeMakerGenerator implements AbstractGenerator {
       template = configuration.getTemplate(fileName);
 
     } catch(Exception e) {
-      e.printStackTrace();
+      e.printStackTrace(); // todo: Logger
     }
   }
 
@@ -66,31 +69,48 @@ public class FreeMakerGenerator implements AbstractGenerator {
       }
 
     } catch (Exception e) {
-      e.printStackTrace();
+      e.printStackTrace(); // todo: Logger
     }
 
     return line;
   }
+  public void beforeWrite(String filePath) {
+
+    try {
+      Path path = Paths.get(filePath);
+
+      if(!Files.exists(path)) {
+        Files.createDirectories(path.getParent());
+      }
+    } catch(Exception e) {
+      // todo: Logger
+    }
+  }
 
   @Override
-  public void write(String fileName) {
+  public void write(String filePath) {
 
-     try(
-       PrintWriter printWriter = new PrintWriter(Env.OUTPUT_PATH + File.separator + fileName, "UTF-8");
-       BufferedWriter bufferedWriter = new BufferedWriter(printWriter);
-       Writer templateWriter = new StringWriter();
-     ) {
+    beforeWrite(filePath);
 
-      template.process(model, templateWriter);
-      templateWriter.flush();
+    Thread thread = new Thread(() -> {
 
-      bufferedWriter.write(templateWriter.toString());
-      bufferedWriter.flush();
+      try(
+        PrintWriter printWriter = new PrintWriter(filePath, "UTF-8");
+        BufferedWriter bufferedWriter = new BufferedWriter(printWriter);
+        Writer templateWriter = new StringWriter();
+      ) {
 
-    } catch(Exception e) {
-       // todo: Logger
-       e.printStackTrace();
-    }
+        template.process(model, templateWriter);
+        templateWriter.flush();
+
+        bufferedWriter.write(templateWriter.toString());
+        bufferedWriter.flush();
+
+      } catch(Exception e) {
+        e.printStackTrace(); // todo: Logger
+      }
+    });
+    Env.THREAD_POOL.submit(thread);
   }
 
   @Override
@@ -100,18 +120,19 @@ public class FreeMakerGenerator implements AbstractGenerator {
 
       db.getTables()
         .stream()
-        .filter( tbl -> containedTblList.contains(tbl.getName()))
-    //  .filter( tbl -> !exceptedTblList.contains(tbl.getName()))
+        .filter( tbl -> containTables.contains(tbl.getName()))
+    //  .filter( tbl -> exceptTables.contains(tbl.getName()))
         .collect(Collectors.toList())
         .stream()
         .forEach(tbl -> {
 
           setModel("schema", db.getName());
-          setModel("upper_class_name", tbl.getUpperCamel());
-          setModel("lower_class_name", tbl.getLowerCamel());
+          setModel("defaultClassName", tbl.getName());
+          setModel("upperClassName", tbl.getUpperCamel());
+          setModel("lowerClassName", tbl.getLowerCamel());
           setModel("columns", tbl.getColumns());
 
-          write(tbl.getUpperCamel() + ".java");
+          write(Env.OUTPUT_PATH + "/" + db.getName() + "/" + tbl.getUpperCamel() + "Mapper.xml");
         });
     });
   }

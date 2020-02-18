@@ -45,41 +45,38 @@ public class DBFinder implements AbstractFinder {
     } catch(Exception e) {
       // todo: Logger
     }
-
     return table;
   }
 
   @Override
   public List<Schema> findTables(String[] schemaArray) {
 
-    return Arrays.asList(schemaArray).parallelStream().map(
+    return Arrays.asList(schemaArray).stream().map(
 
-        db -> {
-          Schema schema = new Schema(db);
-          String url = host + ":" + port + "/" + db;
+      db -> {
+        Schema schema = new Schema(db);
+        String url = host + ":" + port + "/" + db;
 
-          try(
-           Connection conn = DriverManager.getConnection(url, username, password);
-          ) {
+        try(
+         Connection conn = DriverManager.getConnection(url, username, password);
+        ) {
 
-            // DB 메타데이터 취득
-            DatabaseMetaData metaData = (DatabaseMetaData) conn.getMetaData();
-            ResultSet rs = metaData.getTables(null, null, "%", new String[] {"TABLE"});
+          // DB 메타데이터 취득
+          DatabaseMetaData metaData = (DatabaseMetaData) conn.getMetaData();
+          ResultSet rs = metaData.getTables(null, null, "%", new String[] {"TABLE"});
 
-            // 테이블 정보 보존
-            while(rs.next()) {
-              String model = rs.getString("TABLE_NAME");
-              Table table = new Table(model);
-                    table = findColumns(table, url);
-              schema.addTable(table);
-            }
-
-          } catch(Exception e) {
-            // todo: Logger
+          // 테이블 정보 보존
+          while(rs.next()) {
+            String model = rs.getString("TABLE_NAME");
+            Table table = new Table(model);
+                  table = findColumns(table, url);
+            schema.addTable(table);
           }
-          return schema;
+        } catch(Exception e) {
+          // todo: Logger
         }
-
+        return schema;
+      }
     ).collect(Collectors.toList());
   }
 

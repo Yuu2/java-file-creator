@@ -20,7 +20,7 @@ public class Main {
 
 		AbstractFinder finder = new DBFinder();
 		AbstractGenerator generator = new FreeMakerGenerator();
-		generator.setTemplate("service.ftl");
+		generator.setTemplate("mapperxml.ftl");
 
 		/* DB 메타데이터 */
 		List<Schema> schemaList = finder.findTables(new String[] {
@@ -46,7 +46,7 @@ public class Main {
 
 		/* Rendering */
 		FreeMakerGenerator freeMakerGenerator = (FreeMakerGenerator) generator;
-										   freeMakerGenerator.setContainedTblList(containedTblList);
+										   freeMakerGenerator.setContainTables(containedTblList);
 										   freeMakerGenerator.setModel("imports", imports);
 										   freeMakerGenerator.setModel("annotations", annotations);;
 		                   freeMakerGenerator.render(schemaList);
